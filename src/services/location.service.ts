@@ -4,6 +4,7 @@ export interface ILocation {
     _id: string;
     name: string;
     city: string;
+    state: string;
     slug: string;
     description?: string;
     isActive: boolean;
@@ -14,6 +15,7 @@ export interface ILocation {
 export interface ILocationCreate {
     name: string;
     city: string;
+    state: string;
     slug?: string;
     description?: string;
     isActive?: boolean;
@@ -25,9 +27,14 @@ export interface ILocationResponse {
     totalPages: number;
 }
 
-export const getLocations = async (params: { page?: number; limit?: number; search?: string } = {}): Promise<ILocationResponse> => {
-    const res = await api.get('/api/v1/admin/locations', { params });
-    return res.data;
+export const getLocations = async (params: {
+    page?: number
+    limit?: number
+    isActive?: boolean
+    search?: string
+} = {}): Promise<ILocationResponse> => {
+    const res = await api.get('/api/v1/admin/locations', { params })
+    return res.data
 };
 
 export const getLocationById = async (id: string): Promise<ILocation> => {
@@ -48,4 +55,8 @@ export const updateLocation = async (id: string, data: Partial<ILocationCreate>)
 export const toggleLocationStatus = async (id: string): Promise<ILocation> => {
     const res = await api.patch(`/api/v1/admin/locations/${id}/toggle`);
     return res.data;
+};
+
+export const deleteLocation = async (id: string): Promise<void> => {
+    await api.delete(`/api/v1/admin/locations/${id}`);
 };

@@ -18,6 +18,10 @@ const LocationSchema = Yup.object().shape({
         .min(2, 'City is too short')
         .max(50, 'City is too long')
         .required('City is required'),
+    state: Yup.string()
+        .min(2, 'State is too short')
+        .max(50, 'State is too long')
+        .required('State is required'),
     description: Yup.string().max(200, 'Description is too long').optional(),
     isActive: Yup.boolean().default(true),
 });
@@ -54,6 +58,7 @@ const LocationForm = () => {
         initialValues: {
             name: location?.name || '',
             city: location?.city || '',
+            state: location?.state || '',
             description: location?.description || '',
             isActive: location?.isActive ?? true,
         },
@@ -113,6 +118,21 @@ const LocationForm = () => {
                         />
                         {formik.touched.city && formik.errors.city && (
                             <p className="text-xs text-red-500 dark:text-red-400">{String(formik.errors.city)}</p>
+                        )}
+                    </div>
+
+                    <div className="space-y-2">
+                        <label className="text-sm font-medium text-slate-700 dark:text-neutral-300">State</label>
+                        <Input
+                            name="state"
+                            value={formik.values.state}
+                            onChange={formik.handleChange}
+                            onBlur={formik.handleBlur}
+                            className="bg-white dark:bg-neutral-950 border-slate-300 dark:border-neutral-800 text-slate-900 dark:text-neutral-100 focus:ring-blue-500 focus:border-blue-500"
+                            placeholder="e.g. Kerala"
+                        />
+                        {formik.touched.state && formik.errors.state && (
+                            <p className="text-xs text-red-500 dark:text-red-400">{String(formik.errors.state)}</p>
                         )}
                     </div>
 

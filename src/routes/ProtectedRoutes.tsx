@@ -21,6 +21,9 @@ import PropertyForm from '@/pages/properties/PropertyForm'
 import BusinessContactList from '@/pages/business-contacts/BusinessContactList'
 import BusinessContactForm from '@/pages/business-contacts/BusinessContactForm'
 
+// Auth
+import ChangePassword from '@/pages/auth/ChangePassword'
+
 const ProtectedRoutes = () => {
     return (
         <Route element={<PrivateRoute />}>
@@ -46,6 +49,9 @@ const ProtectedRoutes = () => {
             <Route path='/business-contacts' element={<BusinessContactList />} />
             <Route path='/business-contacts/new' element={<BusinessContactForm />} />
             <Route path='/business-contacts/:id/edit' element={<BusinessContactForm />} />
+
+            {/* Auth */}
+            <Route path='/change-password' element={<ChangePassword />} />
         </Route>
     )
 }

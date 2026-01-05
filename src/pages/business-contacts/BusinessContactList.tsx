@@ -2,20 +2,19 @@ import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { getContacts, toggleContactStatus, deleteContact } from '@/services/business_contact.service';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Plus, Edit2, Power, Search, ChevronLeft, ChevronRight, Mail, Phone, Trash2 } from 'lucide-react';
+
+import { Plus, Edit2, Power, ChevronLeft, ChevronRight, Mail, Phone, Trash2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import toast from 'react-hot-toast';
 
 const BusinessContactList = () => {
     const queryClient = useQueryClient();
     const [page, setPage] = useState(1);
-    const [search, setSearch] = useState('');
     const limit = 10;
 
     const { data, isLoading, isError } = useQuery({
-        queryKey: ['business-contacts', page, search],
-        queryFn: () => getContacts({ page, limit, search })
+        queryKey: ['business-contacts', page],
+        queryFn: () => getContacts({ page, limit })
     });
 
     const toggleMutation = useMutation({
@@ -68,82 +67,130 @@ const BusinessContactList = () => {
                 )}
             </div>
 
-            <div className="flex items-center space-x-2 bg-white dark:bg-neutral-900 border border-slate-200 dark:border-neutral-800 rounded-xl p-2 max-w-md shadow-sm">
-                <Search className="h-4 w-4 text-slate-400 ml-2" />
-                <Input
-                    placeholder="Search name, email, phone..."
-                    value={search}
-                    onChange={(e) => {
-                        setSearch(e.target.value);
-                        setPage(1);
-                    }}
-                    className="bg-transparent border-none text-slate-900 dark:text-neutral-100 focus:ring-0 placeholder:text-slate-400 h-8"
-                />
-            </div>
+
 
             <div className="bg-white dark:bg-neutral-900 border border-slate-200 dark:border-neutral-800 rounded-2xl overflow-hidden shadow-sm dark:shadow-none">
-                <table className="w-full text-left">
-                    <thead className="bg-gradient-to-r from-slate-50 to-slate-100 dark:bg-neutral-800 dark:from-transparent dark:to-transparent border-b border-slate-200 dark:border-neutral-800">
-                        <tr>
-                            <th className="px-6 py-4 text-sm font-semibold text-slate-700 dark:text-neutral-300">Business Name</th>
-                            <th className="px-6 py-4 text-sm font-semibold text-slate-700 dark:text-neutral-300">Contact Details</th>
-                            <th className="px-6 py-4 text-sm font-semibold text-slate-700 dark:text-neutral-300">Status</th>
-                            <th className="px-6 py-4 text-sm font-semibold text-slate-700 dark:text-neutral-300 text-right">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody className="divide-y divide-slate-100 dark:divide-neutral-800">
-                        {contacts.map((contact) => (
-                            <tr key={contact._id} className="hover:bg-blue-50/50 dark:hover:bg-neutral-800/60 transition-colors">
-                                <td className="px-6 py-4">
-                                    <div className="text-slate-900 dark:text-neutral-100 font-medium">{contact.displayName}</div>
-                                    <div className="text-slate-500 dark:text-neutral-400 text-xs truncate max-w-[200px]">
-                                        {contact.description || 'No description'}
-                                    </div>
-                                </td>
-                                <td className="px-6 py-4 space-y-1">
-                                    <div className="flex items-center text-sm text-slate-600 dark:text-neutral-400">
-                                        <Mail className="h-3 w-3 mr-2 text-slate-400 dark:text-neutral-500" /> {contact.email || 'N/A'}
-                                    </div>
-                                    <div className="flex items-center text-sm text-slate-600 dark:text-neutral-400">
-                                        <Phone className="h-3 w-3 mr-2 text-slate-400 dark:text-neutral-500" />
-                                        {contact.phoneNumbers?.find(p => p.isPrimary)?.number || contact.phoneNumbers?.[0]?.number || 'N/A'}
-                                    </div>
-                                </td>
-                                <td className="px-6 py-4">
-                                    <span className={`px-2.5 py-0.5 rounded-full text-xs font-medium ${contact.isActive
-                                        ? 'bg-emerald-100 text-emerald-700 border border-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/20'
-                                        : 'bg-slate-100 text-slate-600 border border-slate-200 dark:bg-slate-500/10 dark:text-slate-400 dark:border-slate-500/20'
-                                        }`}>
-                                        {contact.isActive ? 'Active' : 'Inactive'}
-                                    </span>
-                                </td>
-                                <td className="px-6 py-4 text-right space-x-1 text-white">
-                                    <Link to={`/business-contacts/${contact._id}/edit`}>
-                                        <Button variant="ghost" size="sm" className="text-slate-500 hover:text-blue-600 hover:bg-blue-100 dark:text-neutral-400 dark:hover:bg-neutral-800 dark:hover:text-blue-400">
-                                            <Edit2 className="h-4 w-4" />
-                                        </Button>
-                                    </Link>
-                                    <Button
-                                        variant="ghost"
-                                        size="sm"
-                                        className={`hover:bg-opacity-10 dark:text-neutral-400 ${contact.isActive ? 'text-slate-500 hover:text-orange-600 hover:bg-orange-100 dark:hover:bg-neutral-800 dark:hover:text-orange-400' : 'text-slate-500 hover:text-emerald-600 hover:bg-emerald-100 dark:hover:bg-neutral-800 dark:hover:text-emerald-400'}`}
-                                        onClick={() => toggleMutation.mutate(contact._id)}
-                                    >
-                                        <Power className="h-4 w-4" />
-                                    </Button>
-                                    <Button
-                                        variant="ghost"
-                                        size="sm"
-                                        className="text-slate-500 hover:text-red-600 hover:bg-red-100 dark:text-neutral-400 dark:hover:bg-neutral-800 dark:hover:text-red-400"
-                                        onClick={() => handleDelete(contact._id)}
-                                    >
-                                        <Trash2 className="h-4 w-4" />
-                                    </Button>
-                                </td>
+                {/* Desktop Table View */}
+                <div className="hidden lg:block overflow-x-auto">
+                    <table className="w-full text-left">
+                        <thead className="bg-gradient-to-r from-slate-50 to-slate-100 dark:bg-neutral-800 dark:from-transparent dark:to-transparent border-b border-slate-200 dark:border-neutral-800">
+                            <tr>
+                                <th className="px-6 py-4 text-sm font-semibold text-slate-700 dark:text-neutral-300">Business Name</th>
+                                <th className="px-6 py-4 text-sm font-semibold text-slate-700 dark:text-neutral-300">Contact Details</th>
+                                <th className="px-6 py-4 text-sm font-semibold text-slate-700 dark:text-neutral-300">Status</th>
+                                <th className="px-6 py-4 text-sm font-semibold text-slate-700 dark:text-neutral-300 text-right">Actions</th>
                             </tr>
-                        ))}
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody className="divide-y divide-slate-100 dark:divide-neutral-800">
+                            {contacts.map((contact) => (
+                                <tr key={contact._id} className="hover:bg-blue-50/50 dark:hover:bg-neutral-800/60 transition-colors">
+                                    <td className="px-6 py-4">
+                                        <div className="text-slate-900 dark:text-neutral-100 font-medium">{contact.displayName}</div>
+                                        <div className="text-slate-500 dark:text-neutral-400 text-xs truncate max-w-[200px]">
+                                            {contact.description || 'No description'}
+                                        </div>
+                                    </td>
+                                    <td className="px-6 py-4 space-y-1">
+                                        <div className="flex items-center text-sm text-slate-600 dark:text-neutral-400">
+                                            <Mail className="h-3 w-3 mr-2 text-slate-400 dark:text-neutral-500" /> {contact.email || 'N/A'}
+                                        </div>
+                                        <div className="flex items-center text-sm text-slate-600 dark:text-neutral-400">
+                                            <Phone className="h-3 w-3 mr-2 text-slate-400 dark:text-neutral-500" />
+                                            {contact.phoneNumbers?.find(p => p.isPrimary)?.number || contact.phoneNumbers?.[0]?.number || 'N/A'}
+                                        </div>
+                                    </td>
+                                    <td className="px-6 py-4">
+                                        <span className={`px-2.5 py-0.5 rounded-full text-xs font-medium ${contact.isActive
+                                            ? 'bg-emerald-100 text-emerald-700 border border-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/20'
+                                            : 'bg-slate-100 text-slate-600 border border-slate-200 dark:bg-slate-500/10 dark:text-slate-400 dark:border-slate-500/20'
+                                            }`}>
+                                            {contact.isActive ? 'Active' : 'Inactive'}
+                                        </span>
+                                    </td>
+                                    <td className="px-6 py-4 text-right space-x-1 text-white">
+                                        <Link to={`/business-contacts/${contact._id}/edit`}>
+                                            <Button variant="ghost" size="sm" className="text-slate-500 hover:text-blue-600 hover:bg-blue-100 dark:text-neutral-400 dark:hover:bg-neutral-800 dark:hover:text-blue-400">
+                                                <Edit2 className="h-4 w-4" />
+                                            </Button>
+                                        </Link>
+                                        <Button
+                                            variant="ghost"
+                                            size="sm"
+                                            className={`hover:bg-opacity-10 dark:text-neutral-400 ${contact.isActive ? 'text-slate-500 hover:text-orange-600 hover:bg-orange-100 dark:hover:bg-neutral-800 dark:hover:text-orange-400' : 'text-slate-500 hover:text-emerald-600 hover:bg-emerald-100 dark:hover:bg-neutral-800 dark:hover:text-emerald-400'}`}
+                                            onClick={() => toggleMutation.mutate(contact._id)}
+                                        >
+                                            <Power className="h-4 w-4" />
+                                        </Button>
+                                        <Button
+                                            variant="ghost"
+                                            size="sm"
+                                            className="text-slate-500 hover:text-red-600 hover:bg-red-100 dark:text-neutral-400 dark:hover:bg-neutral-800 dark:hover:text-red-400"
+                                            onClick={() => handleDelete(contact._id)}
+                                        >
+                                            <Trash2 className="h-4 w-4" />
+                                        </Button>
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
+
+                {/* Mobile Card View */}
+                <div className="grid grid-cols-1 gap-4 lg:hidden p-4">
+                    {contacts.map((contact) => (
+                        <div key={contact._id} className="bg-slate-50 dark:bg-neutral-900 border border-slate-200 dark:border-neutral-800 rounded-lg p-4 space-y-3">
+                            <div className="flex justify-between items-start">
+                                <div>
+                                    <h3 className="font-medium text-slate-900 dark:text-neutral-100">{contact.displayName}</h3>
+                                    <p className="text-xs text-slate-500 dark:text-neutral-400 mt-1 truncate max-w-[200px]">
+                                        {contact.description || 'No description'}
+                                    </p>
+                                </div>
+                                <span className={`px-2.5 py-0.5 rounded-full text-xs font-medium ${contact.isActive
+                                    ? 'bg-emerald-100 text-emerald-700 border border-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/20'
+                                    : 'bg-slate-100 text-slate-600 border border-slate-200 dark:bg-slate-500/10 dark:text-slate-400 dark:border-slate-500/20'
+                                    }`}>
+                                    {contact.isActive ? 'Active' : 'Inactive'}
+                                </span>
+                            </div>
+
+                            <div className="space-y-1">
+                                <div className="flex items-center text-sm text-slate-600 dark:text-neutral-400">
+                                    <Mail className="h-3 w-3 mr-2 text-slate-400 dark:text-neutral-500" /> {contact.email || 'N/A'}
+                                </div>
+                                <div className="flex items-center text-sm text-slate-600 dark:text-neutral-400">
+                                    <Phone className="h-3 w-3 mr-2 text-slate-400 dark:text-neutral-500" />
+                                    {contact.phoneNumbers?.find(p => p.isPrimary)?.number || contact.phoneNumbers?.[0]?.number || 'N/A'}
+                                </div>
+                            </div>
+
+                            <div className="flex justify-end gap-2 pt-3 border-t border-slate-200 dark:border-neutral-800">
+                                <Link to={`/business-contacts/${contact._id}/edit`}>
+                                    <Button variant="ghost" size="sm" className="text-slate-500 hover:text-blue-600 hover:bg-blue-100 dark:text-neutral-400 dark:hover:bg-neutral-800 dark:hover:text-blue-400">
+                                        <Edit2 className="h-4 w-4" />
+                                    </Button>
+                                </Link>
+                                <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    className={`hover:bg-opacity-10 dark:text-neutral-400 ${contact.isActive ? 'text-slate-500 hover:text-orange-600 hover:bg-orange-100 dark:hover:bg-neutral-800 dark:hover:text-orange-400' : 'text-slate-500 hover:text-emerald-600 hover:bg-emerald-100 dark:hover:bg-neutral-800 dark:hover:text-emerald-400'}`}
+                                    onClick={() => toggleMutation.mutate(contact._id)}
+                                >
+                                    <Power className="h-4 w-4" />
+                                </Button>
+                                <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    className="text-slate-500 hover:text-red-600 hover:bg-red-100 dark:text-neutral-400 dark:hover:bg-neutral-800 dark:hover:text-red-400"
+                                    onClick={() => handleDelete(contact._id)}
+                                >
+                                    <Trash2 className="h-4 w-4" />
+                                </Button>
+                            </div>
+                        </div>
+                    ))}
+                </div>
                 {contacts.length === 0 && (
                     <div className="p-12 text-center text-slate-500">
                         No contacts found.

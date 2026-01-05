@@ -88,3 +88,7 @@ export const toggleFieldDefinitionStatus = async (id: string): Promise<IFieldDef
     const res = await api.patch(`/api/v1/admin/field-definitions/${id}/toggle`)
     return res.data
 }
+
+export const deleteFieldDefinition = async (id: string): Promise<void> => {
+    await api.delete(`/api/v1/admin/field-definitions/${id}`)
+}

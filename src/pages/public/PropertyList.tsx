@@ -4,6 +4,7 @@ import { usePublicProperties } from '@/hooks/usePublicProperties';
 import { useFieldDefinitions } from '@/hooks/usePublicProperties';
 import { PropertyCard } from '@/components/public/PropertyCard';
 import { DynamicFilters } from '@/components/public/DynamicFilters';
+import { useDebounce } from '@/hooks/useDebounce';
 
 export const PropertyList = () => {
     const navigate = useNavigate();
@@ -15,6 +16,10 @@ export const PropertyList = () => {
     const [city, setCity] = useState('');
     const [locality, setLocality] = useState('');
 
+    const debouncedSearch = useDebounce(search, 300);
+    const debouncedCity = useDebounce(city, 300);
+    const debouncedLocality = useDebounce(locality, 300);
+
     // Fetch field definitions for dynamic filters
     const { fieldDefinitions, loading: loadingFields } = useFieldDefinitions('property');
 
@@ -22,9 +27,9 @@ export const PropertyList = () => {
     const queryParams = {
         page,
         limit: 20,
-        ...(search && { search }),
-        ...(city && { city }),
-        ...(locality && { locality }),
+        ...(debouncedSearch && { search: debouncedSearch }),
+        ...(debouncedCity && { city: debouncedCity }),
+        ...(debouncedLocality && { locality: debouncedLocality }),
         ...filters,
     };
 
@@ -34,9 +39,9 @@ export const PropertyList = () => {
     // Update URL params when filters change
     useEffect(() => {
         const params: Record<string, string> = {};
-        if (search) params.search = search;
-        if (city) params.city = city;
-        if (locality) params.locality = locality;
+        if (debouncedSearch) params.search = debouncedSearch;
+        if (debouncedCity) params.city = debouncedCity;
+        if (debouncedLocality) params.locality = debouncedLocality;
         if (page > 1) params.page = String(page);
 
         Object.entries(filters).forEach(([key, value]) => {
@@ -46,7 +51,7 @@ export const PropertyList = () => {
         });
 
         setSearchParams(params);
-    }, [filters, search, city, locality, page]);
+    }, [filters, debouncedSearch, debouncedCity, debouncedLocality, page]);
 
     const handlePropertyClick = (slug: string) => {
         navigate(`/listings/${slug}`);

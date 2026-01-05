@@ -5,7 +5,8 @@ import {
     Settings,
     Building,
     Users,
-    X
+    X,
+    LockKeyhole
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
@@ -21,6 +22,7 @@ const sidebarItems = [
     { name: 'Field Definitions', href: '/field-definitions', icon: Settings },
     { name: 'Properties', href: '/properties', icon: Building },
     { name: 'Business Contacts', href: '/business-contacts', icon: Users },
+    { name: 'Change Password', href: '/change-password', icon: LockKeyhole },
 ]
 
 export function AdminSidebar({ isOpen, onClose }: SidebarProps) {

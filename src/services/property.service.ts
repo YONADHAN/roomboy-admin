@@ -6,11 +6,15 @@ export interface IProperty {
     title: string
     entityType: 'property'
     attributes: Record<string, any>
-    location?: {
+    location: any // Populated location or ID
+    address: {
+        street?: string
         city?: string
         locality?: string
-        latitude?: number
-        longitude?: number
+    }
+    coordinates: {
+        lat: number
+        lng: number
     }
     images: string[]
     status: 'active' | 'blocked' | 'pending'
@@ -31,15 +35,19 @@ export interface IPropertyResponse {
 
 export interface ICreatePropertyDTO {
     title: string
-    attributes?: Record<string, any>
-    location?: {
+    status: 'active' | 'blocked' | 'pending'
+    location: string // ObjectId
+    address: {
+        street?: string
         city?: string
         locality?: string
-        latitude?: number
-        longitude?: number
     }
-    images?: string[]
-    status?: 'active' | 'blocked' | 'pending'
+    coordinates: {
+        lat: number
+        lng: number
+    }
+    images: string[]
+    attributes: Record<string, any>
 }
 
 export interface IUpdatePropertyDTO {
